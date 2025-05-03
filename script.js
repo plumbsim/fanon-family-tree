@@ -14,7 +14,7 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
     const card = document.createElement("div");
-    card.className = "memberCard";
+    card.className = "memberCard"; makeDraggable(card);
 
     // Apply hard vertical split background
     let bg = "";
@@ -46,3 +46,33 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
   reader.readAsDataURL(imageFile);
   document.getElementById("memberForm").reset();
 });
+
+// Make cards draggable
+function makeDraggable(card) {
+  let offsetX, offsetY, isDragging = false;
+
+  card.style.position = "absolute"; // Allows free positioning
+  card.style.cursor = "move";
+
+  card.addEventListener("mousedown", function (e) {
+    isDragging = true;
+    offsetX = e.clientX - card.getBoundingClientRect().left;
+    offsetY = e.clientY - card.getBoundingClientRect().top;
+    card.style.zIndex = 1000; // bring to front
+  });
+
+  document.addEventListener("mousemove", function (e) {
+    if (!isDragging) return;
+    const canvas = document.getElementById("treeCanvas");
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left - offsetX;
+    const y = e.clientY - rect.top - offsetY;
+    card.style.left = `${x}px`;
+    card.style.top = `${y}px`;
+  });
+
+  document.addEventListener("mouseup", function () {
+    isDragging = false;
+    card.style.zIndex = "";
+  });
+}
