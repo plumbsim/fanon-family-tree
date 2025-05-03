@@ -3,17 +3,33 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
 
   const name = document.getElementById("nameInput").value;
   const imageFile = document.getElementById("imageInput").files[0];
-  const color1 = document.getElementById("color1").value || "#444";
-  const color2 = document.getElementById("color2").value || color1;
-  const color3 = document.getElementById("color3").value || color2;
+  const colors = [
+    document.getElementById("color1").value,
+    document.getElementById("color2").value,
+    document.getElementById("color3").value
+  ].filter(Boolean); // Only keep filled-in colors
 
-  if (!imageFile) return;
+  if (!imageFile || colors.length === 0) return;
 
   const reader = new FileReader();
   reader.onload = function (event) {
     const card = document.createElement("div");
     card.className = "memberCard";
-    card.style.background = `linear-gradient(135deg, ${color1}, ${color2}, ${color3})`;
+
+    // Apply hard vertical split background
+    let bg = "";
+    if (colors.length === 1) {
+      bg = colors[0];
+    } else {
+      const stops = colors.map((c, i) => {
+        const percent = (i / colors.length) * 100;
+        const next = ((i + 1) / colors.length) * 100;
+        return `${c} ${percent}%, ${c} ${next}%`;
+      }).join(", ");
+      bg = `linear-gradient(to right, ${stops})`;
+    }
+
+    card.style.background = bg;
 
     const img = document.createElement("img");
     img.src = event.target.result;
@@ -28,7 +44,5 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
   };
 
   reader.readAsDataURL(imageFile);
-
-  // Reset form
   document.getElementById("memberForm").reset();
 });
