@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fanon Family Tree Builder</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Fanon Family Tree Builder</h1>
+
+  <form id="memberForm">
+    <label>
+      Name:
+      <input type="text" id="nameInput" required />
+    </label>
+
+    <label>
+      Headshot:
+      <input type="file" id="imageInput" accept="image/*" required />
+    </label>
+
+    <label>
+      Background Color 1:
+      <input type="color" id="color1" />
+    </label>
+
+    <label>
+      Background Color 2:
+      <input type="color" id="color2" />
+    </label>
+
+    <label>
+      Background Color 3:
+      <input type="color" id="color3" />
+    </label>
+
+    <button type="submit">Add Member</button>
+  </form>
+
+  <div id="treeCanvas"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
