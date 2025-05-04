@@ -3,114 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Tree Templates</title>
+  <title>Fanon Family Tree Builder</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f8f8ff;
-      padding: 40px;
-      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
     }
 
-    h2 {
-      margin-top: 50px;
+    #sidebar {
+      width: 250px;
+      background: #f4f4f4;
+      padding: 20px;
+      border-right: 1px solid #ccc;
     }
 
-    .tree {
+    #treeCanvas {
+      flex-grow: 1;
+      overflow: auto;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 60px;
-    }
-
-    .row {
-      display: flex;
       gap: 40px;
-      margin-top: 10px;
+      background-color: #fff;
     }
 
-    .member {
-      width: 100px;
-      height: 100px;
+    .button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .template {
+      border: 2px dashed #888;
+      padding: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .person {
       border: 2px solid #333;
-      background-color: #e0e0e0;
+      padding: 5px 10px;
+      display: inline-block;
+      background: #eee;
+      border-radius: 8px;
+    }
+
+    .connector {
+      width: 2px;
+      height: 20px;
+      background: black;
+      margin: 0 auto;
+    }
+
+    .horizontal-line {
+      height: 2px;
+      width: 100%;
+      background: black;
+    }
+
+    .bracket {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      border-radius: 10px;
+      justify-content: space-between;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-
-  <h1>Family Tree Layout Examples</h1>
-
-  <!-- SINGLE PARENT → CHILD -->
-  <h2>Single Parent → Child</h2>
-  <div class="tree">
-    <div class="member">Parent</div>
-    <svg height="50" width="2">
-      <line x1="1" y1="0" x2="1" y2="50" stroke="black" />
-    </svg>
-    <div class="member">Child</div>
+  <div id="sidebar">
+    <h3>Templates</h3>
+    <button class="button" onclick="addTemplate('singleParentChild')">Single Parent + Child</button>
+    <button class="button" onclick="addTemplate('partners')">Partners</button>
+    <button class="button" onclick="addTemplate('partnersWithChild')">Partners + Child</button>
+    <button class="button" onclick="addTemplate('siblings')">Siblings</button>
+    <button class="button" onclick="addTemplate('multiChild')">Single Parent + Multiple Kids</button>
   </div>
 
-  <!-- SIBLINGS (NO PARENTS) -->
-  <h2>Siblings Only</h2>
-  <div class="tree">
-    <svg height="30" width="260">
-      <line x1="30" y1="30" x2="230" y2="30" stroke="black" />
-      <line x1="70" y1="0" x2="70" y2="30" stroke="black" />
-      <line x1="190" y1="0" x2="190" y2="30" stroke="black" />
-    </svg>
-    <div class="row">
-      <div class="member">Sibling 1</div>
-      <div class="member">Sibling 2</div>
-    </div>
-  </div>
+  <div id="treeCanvas"></div>
 
-  <!-- SINGLE PARENT → MULTIPLE CHILDREN -->
-  <h2>Single Parent → Multiple Children</h2>
-  <div class="tree">
-    <div class="member">Parent</div>
-    <svg height="50" width="160">
-      <line x1="80" y1="0" x2="80" y2="25" stroke="black" />
-      <line x1="40" y1="25" x2="120" y2="25" stroke="black" />
-      <line x1="40" y1="25" x2="40" y2="50" stroke="black" />
-      <line x1="120" y1="25" x2="120" y2="50" stroke="black" />
-    </svg>
-    <div class="row">
-      <div class="member">Child 1</div>
-      <div class="member">Child 2</div>
-    </div>
-  </div>
+  <script>
+    function createPerson(name = 'Person') {
+      const el = document.createElement('div');
+      el.className = 'person';
+      el.textContent = name;
+      return el;
+    }
 
-  <!-- PARTNERS -->
-  <h2>Partners</h2>
-  <div class="tree">
-    <div class="row">
-      <div class="member">Partner A</div>
-      <div class="member">Partner B</div>
-    </div>
-    <svg height="20" width="220">
-      <line x1="50" y1="0" x2="170" y2="0" stroke="black" />
-    </svg>
-  </div>
+    function addTemplate(type) {
+      const container = document.createElement('div');
+      container.className = 'template';
 
-  <!-- PARTNERS WITH CHILD -->
-  <h2>Partners → Child</h2>
-  <div class="tree">
-    <div class="row">
-      <div class="member">Partner A</div>
-      <div class="member">Partner B</div>
-    </div>
-    <svg height="60" width="220">
-      <line x1="50" y1="0" x2="170" y2="0" stroke="black" />
-      <line x1="110" y1="0" x2="110" y2="60" stroke="black" />
-    </svg>
-    <div class="member">Child</div>
-  </div>
+      if (type === 'singleParentChild') {
+        container.appendChild(createPerson('Parent'));
+        container.appendChild(document.createElement('div')).className = 'connector';
+        container.appendChild(createPerson('Child'));
 
+      } else if (type === 'partners') {
+        const bracket = document.createElement('div');
+        bracket.className = 'bracket';
+        bracket.appendChild(createPerson('Partner A'));
+        bracket.appendChild(createPerson('Partner B'));
+        container.appendChild(bracket);
+
+      } else if (type === 'partnersWithChild') {
+        const bracket = document.createElement('div');
+        bracket.className = 'bracket';
+        bracket.appendChild(createPerson('Partner A'));
+        bracket.appendChild(createPerson('Partner B'));
+
+        container.appendChild(bracket);
+        container.appendChild(document.createElement('div')).className = 'connector';
+        container.appendChild(createPerson('Child'));
+
+      } else if (type === 'siblings') {
+        container.appendChild(document.createElement('div')).className = 'horizontal-line';
+        const bracket = document.createElement('div');
+        bracket.className = 'bracket';
+        bracket.appendChild(createPerson('Sibling A'));
+        bracket.appendChild(createPerson('Sibling B'));
+        container.appendChild(bracket);
+
+      } else if (type === 'multiChild') {
+        container.appendChild(createPerson('Parent'));
+        container.appendChild(document.createElement('div')).className = 'connector';
+        container.appendChild(document.createElement('div')).className = 'horizontal-line';
+        const kids = document.createElement('div');
+        kids.className = 'bracket';
+        kids.appendChild(createPerson('Child A'));
+        kids.appendChild(createPerson('Child B'));
+        container.appendChild(kids);
+      }
+
+      document.getElementById('treeCanvas').appendChild(container);
+    }
+  </script>
 </body>
 </html>
