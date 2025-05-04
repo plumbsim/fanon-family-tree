@@ -1,141 +1,137 @@
-// script.js
+// Fanon Family Tree Builder - script.js
+
+let members = [];
+let relationships = [];
+
 const memberForm = document.getElementById("memberForm");
 const treeCanvas = document.getElementById("treeCanvas");
 const connectionCanvas = document.getElementById("connectionCanvas");
 const ctx = connectionCanvas.getContext("2d");
-
 const memberASelect = document.getElementById("memberA");
 const memberBSelect = document.getElementById("memberB");
-const relationshipTypeSelect = document.getElementById("relationshipType");
-
-let members = [];
-let relationships = [];
 
 memberForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const name = document.getElementById("nameInput").value;
-  const imageFile = document.getElementById("imageInput").files[0];
+  const image = document.getElementById("imageInput").files[0];
   const color1 = document.getElementById("color1").value;
   const color2 = document.getElementById("color2").value;
   const color3 = document.getElementById("color3").value;
 
   const reader = new FileReader();
   reader.onload = function () {
-    const imageUrl = reader.result;
     const member = {
       id: members.length,
       name,
-      imageUrl,
+      imageSrc: reader.result,
       colors: [color1, color2, color3],
-      element: null,
-      level: 0
+      level: 0,
     };
     members.push(member);
-    addMemberToSelect(member);
-    renderTree();
+    addMemberCard(member);
+    updateSelectMenus();
+    drawConnections();
   };
-  if (imageFile) {
-    reader.readAsDataURL(imageFile);
-  }
+  reader.readAsDataURL(image);
+
+  memberForm.reset();
 });
 
-function addMemberToSelect(member) {
-  const optionA = document.createElement("option");
-  optionA.value = member.id;
-  optionA.textContent = member.name;
-  memberASelect.appendChild(optionA);
+function addMemberCard(member) {
+  let levelDiv = document.querySelector(`.treeLevel[data-level='${member.level}']`);
+  if (!levelDiv) {
+    levelDiv = document.createElement("div");
+    levelDiv.classList.add("treeLevel");
+    levelDiv.dataset.level = member.level;
+    treeCanvas.appendChild(levelDiv);
+  }
 
-  const optionB = document.createElement("option");
-  optionB.value = member.id;
-  optionB.textContent = member.name;
-  memberBSelect.appendChild(optionB);
+  const card = document.createElement("div");
+  card.className = "memberCard";
+  card.dataset.id = member.id;
+  card.innerHTML = `
+    <img src="${member.imageSrc}" alt="${member.name}" />
+    <div class="name">${member.name}</div>
+  `;
+
+  levelDiv.appendChild(card);
+}
+
+function updateSelectMenus() {
+  memberASelect.innerHTML = "";
+  memberBSelect.innerHTML = "";
+  members.forEach((m) => {
+    const optionA = document.createElement("option");
+    optionA.value = m.id;
+    optionA.textContent = m.name;
+    memberASelect.appendChild(optionA);
+
+    const optionB = document.createElement("option");
+    optionB.value = m.id;
+    optionB.textContent = m.name;
+    memberBSelect.appendChild(optionB);
+  });
 }
 
 function createRelationship() {
-  const memberA = parseInt(memberASelect.value);
-  const memberB = parseInt(memberBSelect.value);
-  const type = relationshipTypeSelect.value;
+  const idA = parseInt(memberASelect.value);
+  const idB = parseInt(memberBSelect.value);
+  const type = document.getElementById("relationshipType").value;
+  if (idA === idB) return;
 
-  if (isNaN(memberA) || isNaN(memberB) || memberA === memberB) return;
+  relationships.push({ from: idA, to: idB, type });
 
-  relationships.push({ memberA, memberB, type });
+  // Assign levels for vertical layout
+  if (type === "parent") {
+    members[idB].level = Math.max(members[idA].level + 1, members[idB].level);
+  } else if (type === "child") {
+    members[idA].level = Math.max(members[idB].level + 1, members[idA].level);
+  } else if (type === "spouse") {
+    members[idB].level = members[idA].level;
+  } else if (type === "sibling") {
+    members[idB].level = members[idA].level;
+  }
+
   renderTree();
+  drawConnections();
 }
 
 function renderTree() {
   treeCanvas.innerHTML = "";
-  ctx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
+  const levels = [...new Set(members.map((m) => m.level))].sort((a, b) => a - b);
+  levels.forEach((lvl) => {
+    const levelDiv = document.createElement("div");
+    levelDiv.classList.add("treeLevel");
+    levelDiv.dataset.level = lvl;
+    treeCanvas.appendChild(levelDiv);
 
-  const levels = {};
-  members.forEach((member) => {
-    member.level = 0;
+    members.filter((m) => m.level === lvl).forEach(addMemberCard);
   });
-
-  relationships.forEach((rel) => {
-    if (rel.type === "parent") {
-      const parent = members[rel.memberA];
-      const child = members[rel.memberB];
-      child.level = Math.max(child.level, parent.level + 1);
-    }
-  });
-
-  members.forEach((member) => {
-    if (!levels[member.level]) levels[member.level] = [];
-    levels[member.level].push(member);
-  });
-
-  const levelKeys = Object.keys(levels).sort((a, b) => a - b);
-
-  levelKeys.forEach((level) => {
-    const row = document.createElement("div");
-    row.className = "level";
-    levels[level].forEach((member) => {
-      const card = document.createElement("div");
-      card.className = "memberCard";
-      card.style.background = `linear-gradient(to bottom right, ${
-        member.colors[0] || "#ccc"
-      }, ${member.colors[1] || "#ccc"}, ${member.colors[2] || "#ccc"})`;
-
-      const img = document.createElement("img");
-      img.src = member.imageUrl;
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "name";
-      nameDiv.textContent = member.name;
-
-      card.appendChild(img);
-      card.appendChild(nameDiv);
-      row.appendChild(card);
-
-      member.element = card;
-    });
-    treeCanvas.appendChild(row);
-  });
-
-  drawConnections();
 }
 
 function drawConnections() {
-  relationships.forEach((rel) => {
-    const from = members[rel.memberA].element;
-    const to = members[rel.memberB].element;
+  ctx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
+  relationships.forEach(({ from, to, type }) => {
+    const fromCard = document.querySelector(`[data-id='${from}']`);
+    const toCard = document.querySelector(`[data-id='${to}']`);
+    if (!fromCard || !toCard) return;
 
-    if (!from || !to) return;
+    const fromRect = fromCard.getBoundingClientRect();
+    const toRect = toCard.getBoundingClientRect();
 
-    const fromRect = from.getBoundingClientRect();
-    const toRect = to.getBoundingClientRect();
-    const canvasRect = connectionCanvas.getBoundingClientRect();
-
-    const startX = fromRect.left + fromRect.width / 2 - canvasRect.left;
-    const startY = fromRect.bottom - canvasRect.top;
-    const endX = toRect.left + toRect.width / 2 - canvasRect.left;
-    const endY = toRect.top - canvasRect.top;
+    const startX = fromRect.left + fromRect.width / 2 + window.scrollX;
+    const startY = fromRect.bottom + window.scrollY;
+    const endX = toRect.left + toRect.width / 2 + window.scrollX;
+    const endY = toRect.top + window.scrollY;
 
     ctx.beginPath();
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = type === "spouse" ? "blue" : type === "sibling" ? "green" : "black";
     ctx.lineWidth = 2;
     ctx.stroke();
   });
 }
+
+window.addEventListener("resize", drawConnections);
