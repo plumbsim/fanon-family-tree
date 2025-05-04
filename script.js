@@ -15,6 +15,8 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
   reader.onload = function (event) {
     const card = document.createElement("div");
     card.className = "memberCard"; makeDraggable(card);
+restorePositions(); // In case others were already saved
+saveCardPositionOnDrag(card);
 
     // Apply hard vertical split background
     let bg = "";
@@ -76,3 +78,29 @@ function makeDraggable(card) {
     card.style.zIndex = "";
   });
 }
+function saveCardPositionOnDrag(card) {
+  card.addEventListener("mouseup", () => {
+    const id = card.dataset.id;
+    const pos = {
+      left: card.style.left,
+      top: card.style.top
+    };
+    let saved = JSON.parse(localStorage.getItem("positions") || "{}");
+    saved[id] = pos;
+    localStorage.setItem("positions", JSON.stringify(saved));
+  });
+}
+
+function restorePositions() {
+  const saved = JSON.parse(localStorage.getItem("positions") || "{}");
+  Object.entries(saved).forEach(([id, pos]) => {
+    const card = document.querySelector(`.memberCard[data-id="${id}"]`);
+    if (card && pos.left && pos.top) {
+      card.style.position = "absolute";
+      card.style.left = pos.left;
+      card.style.top = pos.top;
+    }
+  });
+}
+card.dataset.id = `card-${Date.now()}`;
+
