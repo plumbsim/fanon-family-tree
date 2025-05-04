@@ -22,11 +22,25 @@ label {
   font-weight: bold;
 }
 
+#relationshipForm {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #f2f2f2;
+  padding: 10px;
+  border-radius: 4px;
+}
+
 #treeCanvas {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  min-height: 500px;
+  border: 1px dashed #aaa;
+  z-index: 1;
 }
 
 .memberCard {
@@ -39,6 +53,7 @@ label {
   display: flex;
   flex-direction: column;
   background-color: #ccc;
+  z-index: 2;
 }
 
 .memberCard img {
@@ -51,23 +66,22 @@ label {
   margin-top: 8px;
   font-weight: bold;
   font-size: 16px;
-  background-color: transparent;
   color: white;
   padding: 2px 4px;
+  background-color: rgba(0, 0, 0, 0.5); /* improves contrast */
+  border-radius: 3px;
 }
 
-#treeCanvas {
-  position: relative;
-  min-height: 500px;
-  border: 1px dashed #aaa;
-}
+/* Optional: Responsive adjustments */
+@media (max-width: 600px) {
+  form,
+  #relationshipForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-#relationshipForm {
-  margin-bottom: 10px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background: #f2f2f2;
-  padding: 10px;
-  border-radius: 4px;
+  .memberCard {
+    width: 100%;
+    max-width: 300px;
+  }
 }
