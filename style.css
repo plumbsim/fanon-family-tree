@@ -22,46 +22,22 @@ label {
   font-weight: bold;
 }
 
-#relationshipForm {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  background: #f2f2f2;
-  padding: 10px;
-  border-radius: 4px;
-}
-
-#treeContainer {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  padding-top: 20px;
-}
-
-#connectionCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
-}
-
 #treeCanvas {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-  z-index: 1;
   position: relative;
   min-height: 500px;
+  border: 1px dashed #aaa;
+  padding: 40px 0;
 }
 
-.level {
+.treeLevel {
   display: flex;
-  gap: 30px;
   justify-content: center;
+  gap: 60px;
+  margin-bottom: 60px;
+  position: relative;
 }
 
 .memberCard {
@@ -69,13 +45,10 @@ label {
   padding: 10px;
   border: 2px solid #333;
   text-align: center;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background-color: #ccc;
   position: relative;
-  z-index: 2;
+  background-color: #ccc;
   border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
 
 .memberCard img {
@@ -89,7 +62,27 @@ label {
   margin-top: 8px;
   font-weight: bold;
   font-size: 16px;
-  background-color: transparent;
+  background-color: rgba(0,0,0,0.6);
   color: white;
   padding: 2px 4px;
+  border-radius: 3px;
+}
+
+#relationshipForm {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #f2f2f2;
+  padding: 10px;
+  border-radius: 4px;
+  justify-content: center;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
 }
