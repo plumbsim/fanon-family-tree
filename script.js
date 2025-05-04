@@ -1,155 +1,134 @@
-// Updated script.js for bracket-style spouse-child connections
-
-const members = [];
-const relationships = [];
+// Family Tree Script
 
 const memberForm = document.getElementById("memberForm");
+const nameInput = document.getElementById("nameInput");
+const imageInput = document.getElementById("imageInput");
 const treeCanvas = document.getElementById("treeCanvas");
+const connectionCanvas = document.getElementById("connectionCanvas");
+const ctx = connectionCanvas.getContext("2d");
+
+const relationshipForm = document.getElementById("relationshipForm");
 const memberASelect = document.getElementById("memberA");
 const memberBSelect = document.getElementById("memberB");
-const relationshipType = document.getElementById("relationshipType");
-const canvas = document.getElementById("connectionCanvas");
-const ctx = canvas.getContext("2d");
+const relationshipTypeSelect = document.getElementById("relationshipType");
 
-memberForm.addEventListener("submit", (e) => {
+let members = [];
+let relationships = [];
+
+memberForm.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const name = document.getElementById("nameInput").value;
-  const image = document.getElementById("imageInput").files[0];
-
-  if (!name || !image) return;
+  const name = nameInput.value.trim();
+  const image = imageInput.files[0];
 
   const reader = new FileReader();
-  reader.onload = function (event) {
-    const imageUrl = event.target.result;
-
+  reader.onload = function () {
+    const imageUrl = reader.result;
     const member = {
-      id: members.length,
+      id: Date.now(),
       name,
       imageUrl,
-      x: 200 * (members.length % 5),
-      y: 150 * Math.floor(members.length / 5),
-      spouses: [],
-      children: [],
-      parents: []
+      x: 0,
+      y: 0,
     };
     members.push(member);
-    updateDropdowns();
-    renderTree();
+    updateSelectOptions();
+    renderMembers();
   };
-  reader.readAsDataURL(image);
+  if (image) {
+    reader.readAsDataURL(image);
+  }
 
   memberForm.reset();
 });
 
-function updateDropdowns() {
-  [memberASelect, memberBSelect].forEach(select => {
-    select.innerHTML = "";
-    members.forEach(member => {
-      const option = document.createElement("option");
-      option.value = member.id;
-      option.textContent = member.name;
-      select.appendChild(option);
-    });
+function updateSelectOptions() {
+  memberASelect.innerHTML = "";
+  memberBSelect.innerHTML = "";
+  members.forEach((member) => {
+    const optionA = document.createElement("option");
+    optionA.value = member.id;
+    optionA.textContent = member.name;
+    memberASelect.appendChild(optionA);
+
+    const optionB = document.createElement("option");
+    optionB.value = member.id;
+    optionB.textContent = member.name;
+    memberBSelect.appendChild(optionB);
   });
 }
 
 function createRelationship() {
-  const aId = parseInt(memberASelect.value);
-  const bId = parseInt(memberBSelect.value);
-  const type = relationshipType.value;
+  const idA = parseInt(memberASelect.value);
+  const idB = parseInt(memberBSelect.value);
+  const type = relationshipTypeSelect.value;
 
-  if (aId === bId) return;
-
-  const a = members[aId];
-  const b = members[bId];
-
-  if (type === "spouse") {
-    if (!a.spouses.includes(b.id)) a.spouses.push(b.id);
-    if (!b.spouses.includes(a.id)) b.spouses.push(a.id);
-  } else if (type === "parent") {
-    if (!a.children.includes(b.id)) a.children.push(b.id);
-    if (!b.parents.includes(a.id)) b.parents.push(a.id);
-  } else if (type === "child") {
-    if (!b.children.includes(a.id)) b.children.push(a.id);
-    if (!a.parents.includes(b.id)) a.parents.push(b.id);
+  if (idA !== idB) {
+    relationships.push({ from: idA, to: idB, type });
+    renderMembers();
   }
-
-  renderTree();
 }
 
-function renderTree() {
+function renderMembers() {
   treeCanvas.innerHTML = "";
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  members.forEach(member => {
-    const div = document.createElement("div");
-    div.className = "memberCard";
-    div.style.left = member.x + "px";
-    div.style.top = member.y + "px";
-    div.style.position = "absolute";
+  // Simple vertical stacking for now
+  members.forEach((member, index) => {
+    member.x = 200 + (index % 5) * 180;
+    member.y = 100 + Math.floor(index / 5) * 220;
+
+    const card = document.createElement("div");
+    card.className = "memberCard";
+    card.style.left = member.x + "px";
+    card.style.top = member.y + "px";
+    card.style.position = "absolute";
 
     const img = document.createElement("img");
     img.src = member.imageUrl;
-    div.appendChild(img);
+    card.appendChild(img);
 
-    const nameTag = document.createElement("div");
-    nameTag.className = "name";
-    nameTag.textContent = member.name;
-    div.appendChild(nameTag);
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = member.name;
+    card.appendChild(name);
 
-    treeCanvas.appendChild(div);
+    treeCanvas.appendChild(card);
   });
 
-  // Draw lines
-  members.forEach(member => {
-    // Draw spouse bracket
-    member.spouses.forEach(spouseId => {
-      if (member.id < spouseId) { // avoid duplicate lines
-        const spouse = members[spouseId];
-        const x1 = member.x + 75;
-        const x2 = spouse.x + 75;
-        const y = Math.max(member.y, spouse.y) + 140;
+  drawConnections();
+}
 
-        ctx.beginPath();
-        ctx.moveTo(x1, y);
-        ctx.lineTo(x2, y);
-        ctx.strokeStyle = "#444";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+function drawConnections() {
+  ctx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
 
-        // Connect midpoint to children
-        const midX = (x1 + x2) / 2;
-        ctx.beginPath();
-        ctx.moveTo(midX, y);
-        ctx.lineTo(midX, y + 20);
-        ctx.stroke();
+  relationships.forEach((rel) => {
+    const fromMember = members.find((m) => m.id === rel.from);
+    const toMember = members.find((m) => m.id === rel.to);
 
-        // Draw child lines
-        member.children.forEach(childId => {
-          const child = members[childId];
-          const cx = child.x + 75;
-          const cy = child.y;
-          ctx.beginPath();
-          ctx.moveTo(midX, y + 20);
-          ctx.lineTo(cx, cy);
-          ctx.stroke();
-        });
-      }
-    });
+    if (!fromMember || !toMember) return;
 
-    // Draw parent lines if no spouse
-    if (member.parents.length === 1) {
-      const parent = members[member.parents[0]];
-      const x1 = parent.x + 75;
-      const x2 = member.x + 75;
-      const y1 = parent.y + 150;
-      const y2 = member.y;
+    const fromX = fromMember.x + 75;
+    const fromY = fromMember.y + 150;
+    const toX = toMember.x + 75;
+    const toY = toMember.y;
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    if (rel.type === "parent") {
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+    } else if (rel.type === "sibling") {
+      ctx.moveTo(fromX, fromY - 100);
+      ctx.lineTo(toX, toY - 100);
+    } else if (rel.type === "spouse") {
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, fromY);
     }
+
+    ctx.stroke();
   });
 }
+
+relationshipForm.querySelector("button").addEventListener("click", createRelationship);
