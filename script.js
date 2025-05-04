@@ -104,3 +104,25 @@ function restorePositions() {
 }
 card.dataset.id = `card-${Date.now()}`;
 
+function drawConnection(card1, card2) {
+  const canvas = document.getElementById("connectionCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!card1 || !card2) return;
+
+  const rect1 = card1.getBoundingClientRect();
+  const rect2 = card2.getBoundingClientRect();
+
+  const startX = rect1.left + rect1.width / 2;
+  const startY = rect1.top + rect1.height / 2;
+  const endX = rect2.left + rect2.width / 2;
+  const endY = rect2.top + rect2.height / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(endX, endY);
+  ctx.strokeStyle = "#333";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
