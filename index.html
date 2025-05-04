@@ -42,14 +42,16 @@
     <select id="memberA"></select>
     <select id="relationshipType">
       <option value="parent">Parent</option>
+      <option value="child">Child</option>
       <option value="spouse">Spouse</option>
+      <option value="sibling">Sibling</option>
     </select>
     <select id="memberB"></select>
-    <button type="button" onclick="createRelationship()">Connect</button>
+    <button onclick="createRelationship()">Connect</button>
   </div>
 
-  <div id="treeWrapper">
-    <canvas id="connectionCanvas" width="3000" height="2000"></canvas>
+  <div id="treeCanvasContainer">
+    <canvas id="connectionCanvas" width="2000" height="2000"></canvas>
     <div id="treeCanvas"></div>
   </div>
 
