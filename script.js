@@ -14,9 +14,8 @@ document.getElementById("memberForm").addEventListener("submit", function (e) {
   const reader = new FileReader();
   reader.onload = function (event) {
     const card = document.createElement("div");
-    card.className = "memberCard"; makeDraggable(card);
-restorePositions(); // In case others were already saved
-saveCardPositionOnDrag(card); updateMemberDropdowns();
+    card.className = "memberCard";
+    card.dataset.id = `card-${Date.now()}`; // ✅ Correctly placed here
 
     // Apply hard vertical split background
     let bg = "";
@@ -30,7 +29,6 @@ saveCardPositionOnDrag(card); updateMemberDropdowns();
       }).join(", ");
       bg = `linear-gradient(to right, ${stops})`;
     }
-
     card.style.background = bg;
 
     const img = document.createElement("img");
@@ -43,6 +41,11 @@ saveCardPositionOnDrag(card); updateMemberDropdowns();
     card.appendChild(nameDiv);
 
     document.getElementById("treeCanvas").appendChild(card);
+
+    makeDraggable(card);
+    saveCardPositionOnDrag(card);
+    restorePositions();
+    updateMemberDropdowns();
   };
 
   reader.readAsDataURL(imageFile);
@@ -53,14 +56,14 @@ saveCardPositionOnDrag(card); updateMemberDropdowns();
 function makeDraggable(card) {
   let offsetX, offsetY, isDragging = false;
 
-  card.style.position = "absolute"; // Allows free positioning
+  card.style.position = "absolute";
   card.style.cursor = "move";
 
   card.addEventListener("mousedown", function (e) {
     isDragging = true;
     offsetX = e.clientX - card.getBoundingClientRect().left;
     offsetY = e.clientY - card.getBoundingClientRect().top;
-    card.style.zIndex = 1000; // bring to front
+    card.style.zIndex = 1000;
   });
 
   document.addEventListener("mousemove", function (e) {
@@ -74,122 +77,4 @@ function makeDraggable(card) {
   });
 
   document.addEventListener("mouseup", function () {
-    isDragging = false;
-    card.style.zIndex = "";
-  });
-}
-function saveCardPositionOnDrag(card) {
-  card.addEventListener("mouseup", () => {
-    const id = card.dataset.id;
-    const pos = {
-      left: card.style.left,
-      top: card.style.top
-    };
-    let saved = JSON.parse(localStorage.getItem("positions") || "{}");
-    saved[id] = pos;
-    localStorage.setItem("positions", JSON.stringify(saved));
-  });
-}
-
-function restorePositions() {
-  const saved = JSON.parse(localStorage.getItem("positions") || "{}");
-  Object.entries(saved).forEach(([id, pos]) => {
-    const card = document.querySelector(`.memberCard[data-id="${id}"]`);
-    if (card && pos.left && pos.top) {
-      card.style.position = "absolute";
-      card.style.left = pos.left;
-      card.style.top = pos.top;
-    }
-  });
-}
-card.dataset.id = `card-${Date.now()}`;
-
-function drawConnection(card1, card2) {
-  const canvas = document.getElementById("connectionCanvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (!card1 || !card2) return;
-
-  const rect1 = card1.getBoundingClientRect();
-  const rect2 = card2.getBoundingClientRect();
-
-  const startX = rect1.left + rect1.width / 2;
-  const startY = rect1.top + rect1.height / 2;
-  const endX = rect2.left + rect2.width / 2;
-  const endY = rect2.top + rect2.height / 2;
-
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(endX, endY);
-  ctx.strokeStyle = "#333";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
-
-function updateMemberDropdowns() {
-  const cards = document.querySelectorAll(".memberCard");
-  const memberA = document.getElementById("memberA");
-  const memberB = document.getElementById("memberB");
-
-  memberA.innerHTML = "";
-  memberB.innerHTML = "";
-
-  cards.forEach(card => {
-    const id = card.dataset.id;
-    const name = card.querySelector(".name")?.textContent || id;
-    const optionA = document.createElement("option");
-    const optionB = document.createElement("option");
-    optionA.value = id;
-    optionB.value = id;
-    optionA.textContent = name;
-    optionB.textContent = name;
-    memberA.appendChild(optionA);
-    memberB.appendChild(optionB);
-  });
-}
-
-const relationships = []; // Store all drawn relationships
-
-function createRelationship() {
-  const idA = document.getElementById("memberA").value;
-  const idB = document.getElementById("memberB").value;
-  const type = document.getElementById("relationshipType").value;
-
-  if (idA === idB) return alert("Choose two different members");
-
-  const cardA = document.querySelector(`.memberCard[data-id="${idA}"]`);
-  const cardB = document.querySelector(`.memberCard[data-id="${idB}"]`);
-
-  if (cardA && cardB) {
-    relationships.push({ idA, idB, type });
-    drawAllConnections();
-  }
-}
-
-function drawAllConnections() {
-  const canvas = document.getElementById("connectionCanvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  relationships.forEach(({ idA, idB }) => {
-    const cardA = document.querySelector(`.memberCard[data-id="${idA}"]`);
-    const cardB = document.querySelector(`.memberCard[data-id="${idB}"]`);
-    if (!cardA || !cardB) return;
-
-    const rect1 = cardA.getBoundingClientRect();
-    const rect2 = cardB.getBoundingClientRect();
-
-    const startX = rect1.left + rect1.width / 2;
-    const startY = rect1.top + rect1.height / 2;
-    const endX = rect2.left + rect2.width / 2;
-    const endY = rect2.top + rect2.height / 2;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.strokeStyle = "#333";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-}
+    isDragging =
