@@ -5,53 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fanon Family Tree Builder</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
 </head>
 <body>
   <h1>Fanon Family Tree Builder</h1>
 
   <form id="memberForm">
-    <label>
-      Name:
-      <input type="text" id="nameInput" required />
-    </label>
+    <label for="nameInput">Name:</label>
+    <input type="text" id="nameInput" required />
 
-    <label>
-      Headshot:
-      <input type="file" id="imageInput" accept="image/*" required />
-    </label>
+    <label for="imageInput">Headshot:</label>
+    <input type="file" id="imageInput" accept="image/*" required />
 
-    <label>
-      Background Color 1:
-      <input type="color" id="color1" />
-    </label>
+    <label for="color1">Background Color 1:</label>
+    <input type="color" id="color1" />
 
-    <label>
-      Background Color 2:
-      <input type="color" id="color2" />
-    </label>
+    <label for="color2">Background Color 2:</label>
+    <input type="color" id="color2" />
 
-    <label>
-      Background Color 3:
-      <input type="color" id="color3" />
-    </label>
+    <label for="color3">Background Color 3:</label>
+    <input type="color" id="color3" />
 
     <button type="submit">Add Member</button>
   </form>
-<div id="relationshipForm">
-  <select id="memberA"></select>
-  <select id="relationshipType">
-    <option value="parent">Parent</option>
-    <option value="child">Child</option>
-    <option value="spouse">Spouse</option>
-    <option value="sibling">Sibling</option>
-  </select>
-  <select id="memberB"></select>
-  <button onclick="createRelationship()">Connect</button>
-</div>
 
-  <div id="treeCanvas"></div>
-<canvas id="connectionCanvas" width="1000" height="800" style="position:absolute; top:0; left:0; z-index:0;"></canvas>
+  <hr />
 
-  <script src="script.js"></script>
+  <div id="relationshipForm">
+    <select id="memberA"></select>
+
+    <select id="relationshipType">
+      <option value="parent">Parent</option>
+      <option value="child">Child</option>
+      <option value="spouse">Spouse</option>
+      <option value="sibling">Sibling</option>
+    </select>
+
+    <select id="memberB"></select>
+    <button type="button" onclick="createRelationship()">Connect</button>
+  </div>
+
+  <div id="canvasContainer" style="position: relative;">
+    <canvas id="connectionCanvas" width="1000" height="800"
+            style="position: absolute; top: 0; left: 0; z-index: 0;"></canvas>
+
+    <div id="treeCanvas" style="position: relative; z-index: 1;"></div>
+  </div>
 </body>
 </html>
