@@ -1,40 +1,48 @@
-let members = [];
-let relationships = [];
+const members = {};
+const relationships = [];
+let canvas, ctx;
 
-document.getElementById("memberForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  canvas = document.getElementById('connectionCanvas');
+  ctx = canvas.getContext('2d');
 
-  const name = document.getElementById("nameInput").value;
-  const imageInput = document.getElementById("imageInput");
-  const color1 = document.getElementById("color1").value;
-  const color2 = document.getElementById("color2").value;
-  const color3 = document.getElementById("color3").value;
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const imageUrl = e.target.result;
-    const newMember = {
-      id: members.length,
-      name,
-      imageUrl,
-      colors: [color1, color2, color3],
-      level: 0,
-    };
-    members.push(newMember);
-    updateMemberOptions();
-    renderTree();
-  };
-  reader.readAsDataURL(imageInput.files[0]);
-
-  e.target.reset();
+  document.getElementById('memberForm').addEventListener('submit', addMember);
 });
 
-function updateMemberOptions() {
-  const selects = [document.getElementById("memberA"), document.getElementById("memberB")];
-  selects.forEach(select => {
-    select.innerHTML = "";
-    members.forEach(member => {
-      const option = document.createElement("option");
+function addMember(e) {
+  e.preventDefault();
+  const name = document.getElementById('nameInput').value;
+  const file = document.getElementById('imageInput').files[0];
+  const color1 = document.getElementById('color1').value;
+  const color2 = document.getElementById('color2').value;
+  const color3 = document.getElementById('color3').value;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const id = Date.now().toString();
+    members[id] = {
+      id,
+      name,
+      imageSrc: reader.result,
+      colors: [color1, color2, color3],
+      parents: [],
+      children: [],
+      spouses: [],
+      level: 0,
+    };
+    updateSelectors();
+    renderTree();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateSelectors() {
+  const memberA = document.getElementById('memberA');
+  const memberB = document.getElementById('memberB');
+  [memberA, memberB].forEach(select => {
+    select.innerHTML = '';
+    Object.values(members).forEach(member => {
+      const option = document.createElement('option');
       option.value = member.id;
       option.textContent = member.name;
       select.appendChild(option);
@@ -43,112 +51,114 @@ function updateMemberOptions() {
 }
 
 function createRelationship() {
-  const memberA = parseInt(document.getElementById("memberA").value);
-  const memberB = parseInt(document.getElementById("memberB").value);
-  const type = document.getElementById("relationshipType").value;
+  const idA = document.getElementById('memberA').value;
+  const idB = document.getElementById('memberB').value;
+  const type = document.getElementById('relationshipType').value;
 
-  if (memberA === memberB) return;
+  if (idA === idB) return alert("Cannot relate a member to themselves!");
 
-  relationships.push({ from: memberA, to: memberB, type });
-  assignLevels();
+  if (type === 'parent') {
+    members[idA].children.push(idB);
+    members[idB].parents.push(idA);
+  } else if (type === 'child') {
+    members[idA].parents.push(idB);
+    members[idB].children.push(idA);
+  } else if (type === 'spouse') {
+    if (!members[idA].spouses.includes(idB)) members[idA].spouses.push(idB);
+    if (!members[idB].spouses.includes(idA)) members[idB].spouses.push(idA);
+  }
+
+  relationships.push({ from: idA, to: idB, type });
   renderTree();
 }
 
-function assignLevels() {
-  members.forEach(m => m.level = 0);
-  const graph = {};
-  members.forEach(m => graph[m.id] = []);
-
-  relationships.forEach(r => {
-    if (r.type === "parent") {
-      graph[r.from].push(r.to);
-    }
-  });
-
-  function dfs(node, level) {
-    members[node].level = Math.max(members[node].level, level);
-    graph[node].forEach(child => dfs(child, level + 1));
-  }
-
-  for (let i = 0; i < members.length; i++) {
-    dfs(i, 0);
-  }
-}
-
 function renderTree() {
-  const treeCanvas = document.getElementById("treeCanvas");
-  treeCanvas.innerHTML = "";
+  const container = document.getElementById('treeCanvas');
+  container.innerHTML = '';
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  assignLevels();
 
   const levels = {};
-  members.forEach(member => {
+  Object.values(members).forEach(member => {
     if (!levels[member.level]) levels[member.level] = [];
     levels[member.level].push(member);
   });
 
+  const positions = {};
+
   Object.keys(levels).sort((a, b) => a - b).forEach(level => {
-    const levelDiv = document.createElement("div");
-    levelDiv.className = "tree-level";
+    const levelDiv = document.createElement('div');
+    levelDiv.className = 'level';
     levels[level].forEach(member => {
-      const card = document.createElement("div");
-      card.className = "memberCard";
-      card.setAttribute("data-id", member.id);
-
-      const img = document.createElement("img");
-      img.src = member.imageUrl;
-
-      const name = document.createElement("div");
-      name.className = "name";
-      name.textContent = member.name;
-
-      const gradient = `linear-gradient(to bottom, ${member.colors[0]}, ${member.colors[1]}, ${member.colors[2]})`;
-      card.style.background = gradient;
-
-      card.appendChild(img);
-      card.appendChild(name);
+      const card = document.createElement('div');
+      card.className = 'memberCard';
+      card.style.background = `linear-gradient(135deg, ${member.colors.join(',')})`;
+      card.innerHTML = `<img src="${member.imageSrc}" alt="${member.name}" />
+                        <div class="name">${member.name}</div>`;
       levelDiv.appendChild(card);
+      member.element = card;
     });
-    treeCanvas.appendChild(levelDiv);
+    container.appendChild(levelDiv);
   });
 
-  drawConnections();
+  setTimeout(() => {
+    Object.values(members).forEach(member => {
+      const rect = member.element.getBoundingClientRect();
+      positions[member.id] = {
+        x: rect.left + rect.width / 2 + window.scrollX,
+        y: rect.top + rect.height / 2 + window.scrollY
+      };
+    });
+
+    relationships.forEach(rel => {
+      const from = positions[rel.from];
+      const to = positions[rel.to];
+      if (!from || !to) return;
+
+      if (rel.type === 'spouse') {
+        drawSpouseBracket(from, to);
+      } else if (rel.type === 'parent') {
+        drawLine(from.x, from.y + 40, to.x, to.y - 40);
+      }
+    });
+  }, 100);
 }
 
-function getMemberPosition(id) {
-  const card = document.querySelector(`.memberCard[data-id='${id}']`);
-  if (!card) return null;
-  const rect = card.getBoundingClientRect();
-  const container = document.getElementById("treeCanvas").getBoundingClientRect();
-  return {
-    x: rect.left + rect.width / 2 - container.left,
-    y: rect.top + rect.height / 2 - container.top
-  };
+function assignLevels() {
+  Object.values(members).forEach(member => member.level = 0);
+  const visited = new Set();
+
+  function dfs(member, level) {
+    if (visited.has(member.id)) return;
+    visited.add(member.id);
+    member.level = Math.max(member.level, level);
+    member.children.forEach(cid => dfs(members[cid], level + 1));
+  }
+
+  Object.values(members)
+    .filter(m => m.parents.length === 0)
+    .forEach(m => dfs(m, 0));
 }
 
-function drawConnections() {
-  const canvas = document.getElementById("connectionCanvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function drawLine(x1, y1, x2, y2) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
 
-  relationships.forEach(({ from, to, type }) => {
-    const posA = getMemberPosition(from);
-    const posB = getMemberPosition(to);
-    if (!posA || !posB) return;
+function drawSpouseBracket(p1, p2) {
+  const x1 = Math.min(p1.x, p2.x);
+  const x2 = Math.max(p1.x, p2.x);
+  const y = (p1.y + p2.y) / 2 + 40;
+  const midX = (x1 + x2) / 2;
 
-    ctx.beginPath();
-    ctx.strokeStyle = "#444";
-    ctx.lineWidth = 2;
+  // Horizontal bracket
+  drawLine(x1, y, x2, y);
 
-    if (type === "parent") {
-      ctx.moveTo(posA.x, posA.y + 75);
-      ctx.lineTo(posB.x, posB.y - 75);
-    } else if (type === "spouse") {
-      const midY = (posA.y + posB.y) / 2 + 40;
-      ctx.moveTo(posA.x, posA.y + 75);
-      ctx.lineTo(posA.x, midY);
-      ctx.lineTo(posB.x, midY);
-      ctx.lineTo(posB.x, posB.y + 75);
-    }
-
-    ctx.stroke();
-  });
+  // Vertical drop from middle
+  drawLine(midX, y, midX, y + 20);
 }
