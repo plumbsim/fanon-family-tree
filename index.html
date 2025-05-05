@@ -1,151 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fanon Family Tree Builder</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fanon Family Tree</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    html, body {
+      height: 100%;
       margin: 0;
-      padding: 0;
-      display: flex;
+      font-family: sans-serif;
+    }
+    #tree {
+      width: 100%;
       height: 100vh;
     }
-
-    #sidebar {
-      width: 250px;
-      background: #f4f4f4;
-      padding: 20px;
-      border-right: 1px solid #ccc;
-    }
-
-    #treeCanvas {
-      flex-grow: 1;
-      overflow: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 40px;
-      background-color: #fff;
-    }
-
-    .button {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      text-align: center;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .template {
-      border: 2px dashed #888;
-      padding: 10px;
-      width: 300px;
-      text-align: center;
-    }
-
-    .person {
-      border: 2px solid #333;
-      padding: 5px 10px;
-      display: inline-block;
-      background: #eee;
-      border-radius: 8px;
-    }
-
-    .connector {
-      width: 2px;
-      height: 20px;
-      background: black;
-      margin: 0 auto;
-    }
-
-    .horizontal-line {
-      height: 2px;
-      width: 100%;
-      background: black;
-    }
-
-    .bracket {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-    }
   </style>
+  <!-- FamilyTreeJS from CDN -->
+  <script src="https://balkangraph.com/js/latest/FamilyTree.js"></script>
 </head>
 <body>
-  <div id="sidebar">
-    <h3>Templates</h3>
-    <button class="button" onclick="addTemplate('singleParentChild')">Single Parent + Child</button>
-    <button class="button" onclick="addTemplate('partners')">Partners</button>
-    <button class="button" onclick="addTemplate('partnersWithChild')">Partners + Child</button>
-    <button class="button" onclick="addTemplate('siblings')">Siblings</button>
-    <button class="button" onclick="addTemplate('multiChild')">Single Parent + Multiple Kids</button>
-  </div>
-
-  <div id="treeCanvas"></div>
+  <div id="tree"></div>
 
   <script>
-    function createPerson(name = 'Person') {
-      const el = document.createElement('div');
-      el.className = 'person';
-      el.textContent = name;
-      return el;
-    }
-
-    function addTemplate(type) {
-      const container = document.createElement('div');
-      container.className = 'template';
-
-      if (type === 'singleParentChild') {
-        container.appendChild(createPerson('Parent'));
-        container.appendChild(document.createElement('div')).className = 'connector';
-        container.appendChild(createPerson('Child'));
-
-      } else if (type === 'partners') {
-        const bracket = document.createElement('div');
-        bracket.className = 'bracket';
-        bracket.appendChild(createPerson('Partner A'));
-        bracket.appendChild(createPerson('Partner B'));
-        container.appendChild(bracket);
-
-      } else if (type === 'partnersWithChild') {
-        const bracket = document.createElement('div');
-        bracket.className = 'bracket';
-        bracket.appendChild(createPerson('Partner A'));
-        bracket.appendChild(createPerson('Partner B'));
-
-        container.appendChild(bracket);
-        container.appendChild(document.createElement('div')).className = 'connector';
-        container.appendChild(createPerson('Child'));
-
-      } else if (type === 'siblings') {
-        container.appendChild(document.createElement('div')).className = 'horizontal-line';
-        const bracket = document.createElement('div');
-        bracket.className = 'bracket';
-        bracket.appendChild(createPerson('Sibling A'));
-        bracket.appendChild(createPerson('Sibling B'));
-        container.appendChild(bracket);
-
-      } else if (type === 'multiChild') {
-        container.appendChild(createPerson('Parent'));
-        container.appendChild(document.createElement('div')).className = 'connector';
-        container.appendChild(document.createElement('div')).className = 'horizontal-line';
-        const kids = document.createElement('div');
-        kids.className = 'bracket';
-        kids.appendChild(createPerson('Child A'));
-        kids.appendChild(createPerson('Child B'));
-        container.appendChild(kids);
-      }
-
-      document.getElementById('treeCanvas').appendChild(container);
-    }
+    const family = new FamilyTree(document.getElementById("tree"), {
+      mode: "tree", // top-down layout
+      nodeBinding: {
+        field_0: "name",
+        field_1: "title",
+        img_0: "img"
+      },
+      nodes: [
+        // Parents
+        { id: 1, name: "Parent A", title: "Mother", img: "https://via.placeholder.com/100" },
+        { id: 2, name: "Parent B", title: "Father", img: "https://via.placeholder.com/100" },
+        { id: 3, pid: 1, mid: 2, name: "Child", title: "Child 1", img: "https://via.placeholder.com/100" },
+        
+        // Siblings
+        { id: 4, pid: 1, mid: 2, name: "Child 2", title: "Sibling", img: "https://via.placeholder.com/100" },
+        { id: 5, pid: 1, mid: 2, name: "Child 3", title: "Sibling", img: "https://via.placeholder.com/100" }
+      ]
+    });
   </script>
 </body>
 </html>
