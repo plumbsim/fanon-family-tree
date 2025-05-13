@@ -1,45 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Fanon Family Tree</title>
+  <link rel="stylesheet" href="css/treant.css">
+  <link rel="stylesheet" href="css/custom.css">
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: sans-serif;
-    }
-    #tree {
-      width: 100%;
-      height: 100vh;
-    }
+    #tree-simple { width: 100%; height: 100vh; }
   </style>
-  <!-- FamilyTreeJS from CDN -->
-  <script src="https://balkangraph.com/js/latest/FamilyTree.js"></script>
 </head>
 <body>
-  <div id="tree"></div>
 
-  <script>
-    const family = new FamilyTree(document.getElementById("tree"), {
-      mode: "tree", // top-down layout
-      nodeBinding: {
-        field_0: "name",
-        field_1: "title",
-        img_0: "img"
-      },
-      nodes: [
-        // Parents
-        { id: 1, name: "Parent A", title: "Mother", img: "https://via.placeholder.com/100" },
-        { id: 2, name: "Parent B", title: "Father", img: "https://via.placeholder.com/100" },
-        { id: 3, pid: 1, mid: 2, name: "Child", title: "Child 1", img: "https://via.placeholder.com/100" },
-        
-        // Siblings
-        { id: 4, pid: 1, mid: 2, name: "Child 2", title: "Sibling", img: "https://via.placeholder.com/100" },
-        { id: 5, pid: 1, mid: 2, name: "Child 3", title: "Sibling", img: "https://via.placeholder.com/100" }
-      ]
-    });
-  </script>
+  <h2 style="text-align:center;">Fanon Family Tree</h2>
+  <div id="tree-simple"></div>
+
+  <script src="js/raphael.min.js"></script>
+  <script src="js/treant.min.js"></script>
+  <script src="js/setup.js"></script>
 </body>
 </html>
