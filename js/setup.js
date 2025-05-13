@@ -5,10 +5,8 @@ function addPerson() {
   const lastName = document.getElementById("lastName").value;
   const birthName = document.getElementById("birthName").value;
 
-  const fullName = firstName + " " + lastName;
-  const displayText = {
-    name: fullName,
-  };
+  const fullName = `${firstName} ${lastName}`;
+  const displayText = { name: fullName };
 
   if (birthName.trim() !== "") {
     displayText.title = `Née: ${birthName}`;
@@ -16,7 +14,12 @@ function addPerson() {
 
   const newPerson = {
     text: displayText
+    // Add other properties as needed
   };
+
+  // Logic to add newPerson to your tree structure
+  // and re-render the tree
+}
 
   if (family.length === 0) {
     // First person becomes the root
