@@ -1,0 +1,13 @@
+.Treant .node {
+  padding: 10px;
+  border: 2px solid #444;
+  border-radius: 10px;
+  background-color: #fdfdfd;
+  font-family: 'Arial';
+  text-align: center;
+}
+
+.Treant .node-name {
+  font-weight: bold;
+  color: #333;
+}
