@@ -3,19 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>Fanon Family Tree</title>
-  <link rel="stylesheet" href="css/treant.css">
-  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://unpkg.com/treant-js@1.0.0/Treant.css">
   <style>
-    #tree-simple { width: 100%; height: 100vh; }
+    .Treant > .node { text-align: center; }
+    .Treant .node-name { font-weight: bold; }
+    .Treant .node-desc { font-style: italic; }
+    .node {
+      padding: 10px;
+      border: 2px solid #555;
+      border-radius: 10px;
+      background: #f0f0f0;
+      width: 120px;
+    }
   </style>
 </head>
 <body>
+  <div id="tree-container" style="width:100%; height:100vh;"></div>
 
-  <h2 style="text-align:center;">Fanon Family Tree</h2>
-  <div id="tree-simple"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+  <script src="https://unpkg.com/treant-js@1.0.0/Treant.min.js"></script>
 
-  <script src="js/raphael.min.js"></script>
-  <script src="js/treant.min.js"></script>
-  <script src="js/setup.js"></script>
+  <script>
+    const chart_config = {
+      chart: {
+        container: "#tree-container",
+        rootOrientation: "NORTH",
+        nodeAlign: "BOTTOM",
+        connectors: {
+          type: 'step'
+        },
+        node: {
+          HTMLclass: 'node'
+        }
+      },
+      nodeStructure: {
+        text: { name: "Parent A" },
+        children: [
+          {
+            text: { name: "Child 1" },
+            children: [
+              { text: { name: "Grandchild A" } },
+              { text: { name: "Grandchild B" } }
+            ]
+          },
+          {
+            text: { name: "Child 2" }
+          }
+        ]
+      }
+    };
+
+    new Treant(chart_config);
+  </script>
 </body>
 </html>
