@@ -1,13 +1,27 @@
 const family = [];
 
 function addPerson() {
-  const name = document.getElementById('name').value;
-  const title = document.getElementById('title').value;
+  const firstName = document.getElementById("firstName").value;
+  const lastName = document.getElementById("lastName").value;
+  const birthName = document.getElementById("birthName").value;
 
-  const newNode = {
-    text: { name, title },
-    HTMLclass: 'nodeExample1'
+  const fullName = firstName + " " + lastName;
+  const displayText = {
+    name: fullName,
   };
+
+  if (birthName.trim() !== "") {
+    displayText.title = `Née: ${birthName}`;
+  }
+
+  const newPerson = {
+    text: displayText
+  };
+
+  // Example: add to a global array or chart_config.nodeStructure
+  console.log("New person added:", newPerson);
+}
+
 
   if (family.length === 0) {
     // First person becomes the root
