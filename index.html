@@ -2,16 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fanon Family Tree</title>
   <link rel="stylesheet" href="css/Treant.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <style>
+    /* Optional: ensures the tree is centered and scrollable if too large */
+    #tree-container {
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
 </head>
 <body>
-  <div id="tree-container"></div>
+  <div id="tree-container">
+    <div id="tree-simple" class="Treant"></div>
+  </div>
 
+  <!-- JS Libraries -->
   <script src="js/raphael.min.js"></script>
-  <script src="js/Treant.js"></script>
-  <script>
-    // Your Treant.js configuration goes here
-  </script>
+  <script src="js/treant.js"></script>
+  <script src="js/setup.js"></script> <!-- This is where you'll define your chart config -->
 </body>
 </html>
