@@ -18,11 +18,6 @@ function addPerson() {
     text: displayText
   };
 
-  // Example: add to a global array or chart_config.nodeStructure
-  console.log("New person added:", newPerson);
-}
-
-
   if (family.length === 0) {
     // First person becomes the root
     family.push(newNode);
