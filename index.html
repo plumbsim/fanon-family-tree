@@ -2,43 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fanon Family Tree</title>
-  <link rel="stylesheet" href="css/Treant.css">
-  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/Treant.css" />
+  <link rel="stylesheet" href="css/custom.css" />
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 1em;
-    }
-    #inputs {
-      margin-bottom: 1em;
-    }
-    #inputs input {
-      margin-right: 0.5em;
-    }
-    #tree-simple {
+    #tree-container {
       width: 100%;
-      height: auto;
+      height: 600px;
+    }
+    form input, form select, form button {
+      margin: 5px;
     }
   </style>
 </head>
 <body>
+  <h1>Fanon Family Tree Builder</h1>
 
-  <h1>Fanon Family Tree</h1>
+  <form id="personForm">
+    <input type="text" id="firstName" placeholder="First Name" required />
+    <input type="text" id="lastName" placeholder="Last Name" required />
+    <input type="text" id="maidenName" placeholder="Maiden Name (optional)" />
 
-  <div id="inputs">
-    <input type="text" id="firstName" placeholder="First Name">
-    <input type="text" id="lastName" placeholder="Last Name">
-    <input type="text" id="birthName" placeholder="Née (optional)">
-    <button onclick="addPerson()">Add Person</button>
-  </div>
+    <select id="relationshipType" required>
+      <option value="">--Select Relationship--</option>
+      <option value="child">Child</option>
+      <option value="parent">Parent</option>
+      <option value="partner">Partner</option>
+      <option value="sibling">Sibling</option>
+    </select>
 
-  <div id="tree-simple" class="chart"></div>
+    <input type="text" id="targetPerson" placeholder="Connect to (Full Name)" required />
+    <button type="button" onclick="addPerson()">Add Person</button>
+  </form>
+
+  <div id="tree-container"></div>
 
   <script src="js/raphael.min.js"></script>
-  <script src="js/treant.js"></script>
+  <script src="js/Treant.js"></script>
   <script src="js/setup.js"></script>
-
 </body>
 </html>
