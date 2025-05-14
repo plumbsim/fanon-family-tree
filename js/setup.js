@@ -1,38 +1,107 @@
-// Initial family tree configuration
-const chart_config = {
+let treeConfig = {
   chart: {
     container: "#tree-simple",
-    node: {
-      HTMLclass: "nodeExample1"
-    },
     connectors: {
-      type: "step"
+      type: 'step'
     },
-    animateOnInit: true
+    node: {
+      HTMLclass: 'nodeExample1'
+    }
   },
   nodeStructure: {
-    text: {
-      name: "First Last",
-      title: "Optional Title"
-    }
+    text: { name: "Root" },
+    children: []
   }
 };
 
-// Global variable to track the current chart
-let tree;
+let people = {};
 
-// Wait until DOM is ready before initializing
-document.addEventListener("DOMContentLoaded", function () {
-  tree = new Treant(chart_config);
-});
-
-// Example of an addPerson function
 function addPerson() {
-  alert("Add Person function triggered!");
+  const firstName = document.getElementById('first-name').value.trim();
+  const lastName = document.getElementById('last-name').value.trim();
+  const maidenName = document.getElementById('maiden-name').value.trim();
+  const relationship = document.getElementById('relationship').value;
+  const relatedTo = document.getElementById('related-to').value.trim();
 
-  // This is where you'd expand your logic to allow adding a person dynamically.
-  // For now, this just demonstrates the function is working.
+  if (!firstName || !lastName) {
+    alert("Please enter at least a first and last name.");
+    return;
+  }
 
-  // Example placeholder for adding logic:
-  // You would likely want to collect input data and rebuild the tree structure.
+  const fullName = maidenName ? `${firstName} ${lastName} (née ${maidenName})` : `${firstName} ${lastName}`;
+  const newNode = {
+    text: { name: fullName },
+    children: []
+  };
+
+  people[fullName] = newNode;
+
+  if (!relatedTo || !people[relatedTo]) {
+    // Add to root if no relationship specified
+    treeConfig.nodeStructure.children.push(newNode);
+  } else {
+    switch (relationship) {
+      case 'parent':
+        // Add new node as parent of existing
+        const childNode = people[relatedTo];
+        const newParent = {
+          text: { name: fullName },
+          children: [childNode]
+        };
+        // Replace child in root if it was there
+        const index = treeConfig.nodeStructure.children.indexOf(childNode);
+        if (index > -1) {
+          treeConfig.nodeStructure.children.splice(index, 1, newParent);
+        }
+        people[fullName] = newParent;
+        break;
+
+      case 'child':
+        people[relatedTo].children.push(newNode);
+        break;
+
+      case 'partner':
+        const partnerNode = people[relatedTo];
+        if (!partnerNode.partner) {
+          partnerNode.partner = newNode;
+          // Show as a sibling node under shared parent for simplicity
+          const parentNode = {
+            text: { name: "" },
+            children: [partnerNode, newNode]
+          };
+          // Replace existing in root if needed
+          const i = treeConfig.nodeStructure.children.indexOf(partnerNode);
+          if (i > -1) {
+            treeConfig.nodeStructure.children.splice(i, 1, parentNode);
+          } else {
+            treeConfig.nodeStructure.children.push(parentNode);
+          }
+        }
+        break;
+
+      case 'sibling':
+        // Simplified: make a blank parent for both
+        const existingNode = people[relatedTo];
+        const siblingGroup = {
+          text: { name: "" },
+          children: [existingNode, newNode]
+        };
+        const idx = treeConfig.nodeStructure.children.indexOf(existingNode);
+        if (idx > -1) {
+          treeConfig.nodeStructure.children.splice(idx, 1, siblingGroup);
+        } else {
+          treeConfig.nodeStructure.children.push(siblingGroup);
+        }
+        break;
+    }
+  }
+
+  document.getElementById('tree-simple').innerHTML = "";
+  new Treant(treeConfig);
+
+  // Clear form fields
+  document.getElementById('first-name').value = "";
+  document.getElementById('last-name').value = "";
+  document.getElementById('maiden-name').value = "";
+  document.getElementById('related-to').value = "";
 }
