@@ -5,6 +5,8 @@ function addPerson() {
   const lastName = document.getElementById("lastName").value;
   const birthName = document.getElementById("birthName").value;
 
+  console.log("Adding person:", firstName, lastName, birthName);
+
   const fullName = `${firstName} ${lastName}`;
   const displayText = { name: fullName };
 
@@ -13,12 +15,12 @@ function addPerson() {
   }
 
   const newPerson = {
-    text: displayText
-    // Add other necessary Treant.js properties here
+    text: displayText,
+    // Add additional Treant.js configuration if needed
   };
 
-  // You'll need logic here to add newPerson to the chart config
-  // and then re-render Treant
+  // For now, just logging to console
+  console.log("New person object:", newPerson);
 }
   if (family.length === 0) {
     // First person becomes the root
