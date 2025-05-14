@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fanon Family Tree</title>
-  <!-- CSS -->
   <link rel="stylesheet" href="css/Treant.css">
   <link rel="stylesheet" href="css/custom.css">
   <style>
-    /* Optional: ensures the tree is centered and scrollable if too large */
-    #tree-container {
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+    }
+    #inputs {
+      margin-bottom: 1em;
+    }
+    #inputs input {
+      margin-right: 0.5em;
+    }
+    #tree-simple {
       width: 100%;
-      height: 100vh;
-      overflow: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <div id="controls">
-  <input type="text" id="firstName" placeholder="First Name">
-  <input type="text" id="lastName" placeholder="Last Name">
-  <input type="text" id="birthName" placeholder="Née">
-  <button onclick="addPerson()">Add Person</button>
-</div>
-    <div id="tree-simple" class="Treant"></div>
+
+  <h1>Fanon Family Tree</h1>
+
+  <div id="inputs">
+    <input type="text" id="firstName" placeholder="First Name">
+    <input type="text" id="lastName" placeholder="Last Name">
+    <input type="text" id="birthName" placeholder="Née (optional)">
+    <button onclick="addPerson()">Add Person</button>
   </div>
- <!-- JS Dependencies -->
- <script src="js/raphael.min.js"></script>
-<script src="js/treant.js"></script>
-<script src="js/setup.js"></script>
+
+  <div id="tree-simple" class="chart"></div>
+
+  <script src="js/raphael.min.js"></script>
+  <script src="js/treant.js"></script>
+  <script src="js/setup.js"></script>
+
 </body>
 </html>
