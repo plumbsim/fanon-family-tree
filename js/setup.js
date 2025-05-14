@@ -14,13 +14,12 @@ function addPerson() {
 
   const newPerson = {
     text: displayText
-    // Add other properties as needed
+    // Add other necessary Treant.js properties here
   };
 
-  // Logic to add newPerson to your tree structure
-  // and re-render the tree
+  // You'll need logic here to add newPerson to the chart config
+  // and then re-render Treant
 }
-
   if (family.length === 0) {
     // First person becomes the root
     family.push(newNode);
