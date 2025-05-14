@@ -1,65 +1,62 @@
-const family = [];
+// Create the base node (root of the tree)
+const rootNode = {
+  text: { name: "Root Character", title: "The Origin" },
+  HTMLclass: "root"
+};
 
+// Tree data structure
+let treeData = [rootNode];
+
+// Treant chart configuration
+const chartConfig = {
+  chart: {
+    container: "#tree-simple",
+    rootOrientation: "NORTH",
+    nodeAlign: "BOTTOM",
+    connectors: {
+      type: "step"
+    },
+    node: {
+      HTMLclass: "nodeExample1"
+    }
+  },
+  nodeStructure: rootNode
+};
+
+// Initialize tree on page load
+window.onload = function () {
+  new Treant(chartConfig);
+};
+
+// Add person function
 function addPerson() {
-  const firstName = document.getElementById("firstName").value;
-  const lastName = document.getElementById("lastName").value;
-  const birthName = document.getElementById("birthName").value;
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
+  const birthName = document.getElementById("birthName").value.trim();
 
-  console.log("Adding person:", firstName, lastName, birthName);
+  if (!firstName || !lastName) {
+    alert("Please provide both first and last names.");
+    return;
+  }
 
   const fullName = `${firstName} ${lastName}`;
-  const displayText = { name: fullName };
-
-  if (birthName.trim() !== "") {
-    displayText.title = `Née: ${birthName}`;
-  }
+  const titleText = birthName ? `Née: ${birthName}` : "";
 
   const newPerson = {
-    text: displayText,
-    // Add additional Treant.js configuration if needed
+    parent: rootNode,
+    text: {
+      name: fullName,
+      title: titleText
+    }
   };
 
-  // For now, just logging to console
-  console.log("New person object:", newPerson);
-}
-  if (family.length === 0) {
-    // First person becomes the root
-    family.push(newNode);
-  } else {
-    // Add as child of root for now (we'll add relationship logic later)
-    newNode.parent = family[0];
-    family.push(newNode);
+  // Add new person to tree
+  if (!rootNode.children) {
+    rootNode.children = [];
   }
+  rootNode.children.push(newPerson);
 
-  renderTree();
-}
-
-function renderTree() {
-  const root = family[0];
-
-  if (!root) return;
-
-  // Rebuild tree structure dynamically
-  for (let i = 1; i < family.length; i++) {
-    family[i].parent = root; // simple model: everyone is child of root
-  }
-
-  const config = {
-    chart: {
-      container: "#tree-simple"
-    },
-    nodeStructure: buildTreeStructure(root)
-  };
-
-  new Treant(config);
-}
-
-// Recursively build node tree
-function buildTreeStructure(node) {
-  const children = family.filter(n => n.parent === node);
-  const cloned = { ...node };
-  if (children.length) {
-    cloned.children = children.map(buildTreeStructure);
-  }
-  return cloned;
+  // Re-render the tree
+  document.getElementById("tree-simple").innerHTML = ""; // Clear previous render
+  new Treant(chartConfig);
 }
