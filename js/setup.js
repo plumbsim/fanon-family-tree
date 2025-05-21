@@ -17,16 +17,17 @@ let treeConfig = {
 let people = {};
 
 function addPerson() {
-  const firstName = document.getElementById('first-name').value.trim();
-  const lastName = document.getElementById('last-name').value.trim();
-  const maidenName = document.getElementById('maiden-name').value.trim();
-  const relationship = document.getElementById('relationship').value;
-  const relatedTo = document.getElementById('related-to').value.trim();
-
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const maidenName = document.getElementById('maidenName').value.trim();
+  
   if (!firstName || !lastName) {
-    alert("Please enter at least a first and last name.");
+    alert("Please fill in at least first and last name.");
     return;
   }
+
+  // Your code to add the person to the tree...
+}
 
   const fullName = maidenName ? `${firstName} ${lastName} (née ${maidenName})` : `${firstName} ${lastName}`;
   const newNode = {
