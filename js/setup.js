@@ -101,8 +101,8 @@ function addPerson() {
   new Treant(treeConfig);
 
   // Clear form fields
-  document.getElementById('first-name').value = "";
-  document.getElementById('last-name').value = "";
-  document.getElementById('maiden-name').value = "";
-  document.getElementById('related-to').value = "";
+  document.getElementById('firstName').value = "";
+  document.getElementById('lastName').value = "";
+  document.getElementById('maidenName').value = "";
+  document.getElementById('relatedTo').value = "";
 }
