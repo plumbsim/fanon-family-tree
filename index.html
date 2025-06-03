@@ -1,143 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create a Fanon Family Tree</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/Treant.css" />
-  <link rel="stylesheet" href="css/custom.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fanon Family Tree</title>
+  <link rel="stylesheet" href="css/Treant.css">
+  <link rel="stylesheet" href="css/custom.css">
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-    }
-
-    header {
-      background-color: #6fa43c;
-      color: white;
-      padding: 20px;
-      font-size: 2em;
-      text-align: center;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .form-panel {
-      width: 30%;
-      background-color: #d1d1d1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .form-panel label {
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
-    }
-
-    .form-panel input, .form-panel select {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
-
-    .form-panel button {
-      width: 100%;
-      padding: 10px;
-      background: #6fa43c;
-      border: none;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .form-panel .relationship-label {
-      margin-top: 20px;
-      color: red;
-    }
-
-    #tree-container {
-      width: 70%;
-      background-color: white;
-      overflow: auto;
-      position: relative;
-    }
-
     #tree {
       width: 100%;
-      height: 100%;
+      height: 100vh;
     }
-
+    .input-section {
+      padding: 1rem;
+      background-color: #f9f9f9;
+      width: 300px;
+      float: left;
+    }
+    #tree-container {
+      margin-left: 320px;
+    }
   </style>
-  
 </head>
 <body>
+  <div class="input-section">
+    <h3>Add Person</h3>
+    <input type="text" id="firstName" placeholder="First Name"><br>
+    <input type="text" id="lastName" placeholder="Last Name"><br>
+    <input type="text" id="birthName" placeholder="Birth Name (optional)"><br>
+    <input type="file" id="portrait" accept="image/*"><br>
+    <select id="gender">
+      <option value="man">Man</option>
+      <option value="woman">Woman</option>
+      <option value="non-binary">Non-Binary</option>
+      <option value="transman">Trans Man</option>
+      <option value="transwoman">Trans Woman</option>
+      <option value="other">Other</option>
+    </select><br>
+    <input type="color" id="bgColor" value="#ffffff"><br>
+    <button onclick="addPerson()">Add Person</button>
 
-  <header>CREATE A FAMILY TREE</header>
-
-  <div class="container">
-    <div class="form-panel">
-      <label for="firstName">FIRST NAME</label>
-      <input type="text" id="firstName" placeholder="e.g. Loki" />
-
-      <label for="lastName">LAST NAME</label>
-      <input type="text" id="lastName" placeholder="e.g. Beaker" />
-
-      <label for="birthName">BIRTH NAME</label>
-      <input type="text" id="birthName" placeholder="e.g. Smith" />
-
-      <label for="portrait">PORTRAIT (URL)</label>
-      <input type="text" id="portrait" placeholder="Image URL" />
-
-      <label for="gender">GENDER</label>
-      <select id="gender">
-        <option value="man">Man</option>
-        <option value="woman">Woman</option>
-        <option value="non-binary">Non-binary</option>
-        <option value="transman">Trans Man</option>
-        <option value="transwoman">Trans Woman</option>
-        <option value="other">Other</option>
-      </select>
-
-      <label for="bgColor">BACKGROUND COLOR</label>
-      <input type="color" id="bgColor" value="#f5f5f5" />
-
-      <button onclick="addPerson()">Add Person</button>
-
-      <div class="relationship-label" id="selectedPersonLabel">No person selected</div>
-
-      <label for="relationTarget">RELATIONSHIP TO</label>
-      <select id="relationTarget">
-        <option value="">Select another person</option>
-      </select>
-
-      <label for="relationType">IS</label>
-      <select id="relationType">
-        <option value="partner">Partner</option>
-        <option value="parentA">Parent A</option>
-        <option value="parentB">Parent B</option>
-        <option value="child">Child</option>
-        <option value="sibling">Sibling</option>
-      </select>
-
-      <button onclick="setRelationship()">Set Relationship</button>
-    </div>
-
-    <div id="tree-container">
-      <div id="tree"></div>
-    </div>
+    <h3>Set Relationship</h3>
+    <select id="personA"></select>
+    <select id="relationshipType">
+      <option value="parent">is parent of</option>
+      <option value="child">is child of</option>
+      <option value="partner">is partner of</option>
+      <option value="sibling">is sibling of</option>
+    </select>
+    <select id="personB"></select>
+    <button onclick="setRelationship()">Set Relationship</button>
+  </div>
+  <div id="tree-container">
+    <div id="tree"></div>
   </div>
 
- <!-- JS -->
   <script src="js/raphael.min.js"></script>
   <script src="js/treant.js"></script>
-  <script defer src="js/setup.js"></script>
+  <script src="js/setup.js"></script>
 </body>
 </html>
