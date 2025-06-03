@@ -3,43 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fanon Family Tree</title>
+  <title>Family Tree Builder</title>
   <link rel="stylesheet" href="css/Treant.css" />
   <link rel="stylesheet" href="css/custom.css" />
+  <script src="js/raphael.min.js"></script>
+  <script src="js/Treant.js"></script>
+  <script defer src="js/setup.js"></script>
   <style>
-    #tree-container {
-      width: 100%;
-      height: 600px;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
     }
-    form input, form select, form button {
-      margin: 5px;
+    .sidebar {
+      width: 300px;
+      background: #ccc;
+      padding: 20px;
+    }
+    .sidebar h2 {
+      background: #5f9a3c;
+      color: white;
+      padding: 10px;
+      margin: -20px -20px 20px -20px;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="file"],
+    input[type="color"],
+    select {
+      width: 100%;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    #selected-info {
+      margin-top: 30px;
+      font-size: 14px;
+    }
+    #selected-info span {
+      color: red;
+      font-weight: bold;
+    }
+    #tree-container {
+      flex-grow: 1;
+      padding: 30px;
+      background: #f5f5f5;
+    }
+    #tree {
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  <h1>Fanon Family Tree Builder</h1>
+  <div class="sidebar">
+    <h2>CREATE A FAMILY TREE</h2>
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" id="firstName" />
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" id="lastName" />
+    </div>
+    <div class="form-group">
+      <label>Birth Name</label>
+      <input type="text" id="birthName" />
+    </div>
+    <div class="form-group">
+      <label>Portrait</label>
+      <input type="file" id="portrait" accept="image/*" />
+    </div>
+    <div class="form-group">
+      <label>Gender</label>
+      <select id="gender">
+        <option>Man</option>
+        <option>Woman</option>
+        <option>Non-binary</option>
+        <option>Transman</option>
+        <option>Transwoman</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Background Color</label>
+      <input type="color" id="bgColor" value="#cccccc" />
+    </div>
 
-  <form id="personForm">
-    <input type="text" id="firstName" placeholder="First Name" required />
-    <input type="text" id="lastName" placeholder="Last Name" required />
-    <input type="text" id="maidenName" placeholder="Maiden Name (optional)" />
+    <button onclick="addPerson()">Add Person</button>
 
-    <select id="relationshipType" required>
-      <option value="">--Select Relationship--</option>
-      <option value="child">Child</option>
-      <option value="parent">Parent</option>
-      <option value="partner">Partner</option>
-      <option value="sibling">Sibling</option>
-    </select>
+    <div id="selected-info">
+      <label><span id="selected-name">[none]</span>'s relationship to</label>
+      <select id="relatedTo"></select>
+      <label>is</label>
+      <select id="relationshipType">
+        <option value="parentA">Parent A</option>
+        <option value="parentB">Parent B</option>
+        <option value="partner">Partner</option>
+        <option value="child">Child</option>
+        <option value="sibling">Sibling</option>
+      </select>
+      <button onclick="setRelationship()">Set Relationship</button>
+    </div>
+  </div>
 
-    <input type="text" id="targetPerson" placeholder="Connect to (Full Name)" required />
-    <button type="button" onclick="addPerson()">Add Person</button>
-  </form>
-
-  <div id="tree-container"></div>
-
-  <script src="js/raphael.min.js"></script>
-  <script src="js/treant.js"></script>
-  <script src="js/setup.js"></script>
+  <div id="tree-container">
+    <div id="tree"></div>
+  </div>
 </body>
 </html>
