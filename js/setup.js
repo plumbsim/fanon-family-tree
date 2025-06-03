@@ -1,130 +1,135 @@
-let family = [];
+// setup.js
+
+let familyData = [];
 let selectedPersonId = null;
+let idCounter = 0;
 
 function addPerson() {
   const firstName = document.getElementById("firstName").value.trim();
   const lastName = document.getElementById("lastName").value.trim();
   const birthName = document.getElementById("birthName").value.trim();
-  const portraitFile = document.getElementById("portrait").files[0];
+  const portrait = document.getElementById("portrait").value.trim();
   const gender = document.getElementById("gender").value;
   const bgColor = document.getElementById("bgColor").value;
 
   if (!firstName || !lastName) return alert("First and Last name are required.");
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const imageUrl = e.target.result;
-    const id = family.length;
-    const person = {
-      id,
-      name: `${firstName} ${lastName}`,
-      firstName,
-      lastName,
-      birthName,
-      gender,
-      bgColor,
-      img: imageUrl,
-      children: [],
-      parentA: null,
-      parentB: null,
-      partner: null
-    };
-    family.push(person);
-    updateDropdowns();
-    renderTree();
+  const id = `person_${idCounter++}`;
+  const fullName = `${firstName} ${lastName}`;
+
+  const node = {
+    id,
+    text: {
+      name: fullName,
+      title: birthName ? `Née ${birthName}` : ""
+    },
+    image: portrait || null,
+    HTMLclass: gender,
+    innerHTML: '',
+    connectors: { style: { stroke: '#000', 'arrow-end': 'none' } },
+    stackChildren: true,
+    children: []
   };
-  if (portraitFile) {
-    reader.readAsDataURL(portraitFile);
-  } else {
-    reader.onload({ target: { result: "" } });
-  }
+
+  node.HTMLid = id;
+  node.backgroundColor = bgColor;
+  node.clickHandler = () => selectPerson(id);
+
+  familyData.push(node);
+  updateDropdowns();
+  renderTree();
 }
 
 function updateDropdowns() {
-  const relatedToSelect = document.getElementById("relatedTo");
-  relatedToSelect.innerHTML = "";
-  family.forEach(p => {
-    const option = document.createElement("option");
-    option.value = p.id;
-    option.textContent = `${p.firstName} ${p.lastName}`;
-    relatedToSelect.appendChild(option);
+  const dropdown = document.getElementById("relationTarget");
+  dropdown.innerHTML = '<option value="">Select another person</option>';
+
+  familyData.forEach(person => {
+    if (person.id !== selectedPersonId) {
+      const option = document.createElement("option");
+      option.value = person.id;
+      option.textContent = person.text.name;
+      dropdown.appendChild(option);
+    }
   });
-}
-
-function setRelationship() {
-  const type = document.getElementById("relationshipType").value;
-  const targetId = parseInt(document.getElementById("relatedTo").value);
-  const person = family[selectedPersonId];
-  const target = family[targetId];
-
-  if (!person || !target) return;
-
-  switch (type) {
-    case "parentA":
-      person.parentA = target.id;
-      break;
-    case "parentB":
-      person.parentB = target.id;
-      break;
-    case "partner":
-      person.partner = target.id;
-      break;
-    case "child":
-      target.children.push(person.id);
-      break;
-    case "sibling":
-      if (!person.parentA && target.parentA) person.parentA = target.parentA;
-      if (!person.parentB && target.parentB) person.parentB = target.parentB;
-      break;
-  }
-  renderTree();
 }
 
 function selectPerson(id) {
   selectedPersonId = id;
-  const person = family[id];
-  document.getElementById("selected-name").textContent = `${person.firstName} ${person.lastName}`.toUpperCase();
+  const selected = familyData.find(p => p.id === id);
+  document.getElementById("selectedPersonLabel").innerHTML = `${selected.text.name.toUpperCase()}'s relationship to`;
+  updateDropdowns();
+}
+
+function setRelationship() {
+  const targetId = document.getElementById("relationTarget").value;
+  const relation = document.getElementById("relationType").value;
+
+  if (!selectedPersonId || !targetId || !relation) return alert("Fill in all relationship fields.");
+
+  const selected = familyData.find(p => p.id === selectedPersonId);
+  const target = familyData.find(p => p.id === targetId);
+
+  switch (relation) {
+    case "partner":
+      if (!selected.partners) selected.partners = [];
+      if (!target.partners) target.partners = [];
+      selected.partners.push(target);
+      target.partners.push(selected);
+      break;
+    case "parentA":
+    case "parentB":
+      if (!target.children) target.children = [];
+      target.children.push(selected);
+      break;
+    case "child":
+      if (!selected.children) selected.children = [];
+      selected.children.push(target);
+      break;
+    case "sibling":
+      // simplified: add to a shared parent
+      break;
+  }
+
+  renderTree();
 }
 
 function renderTree() {
-  const nodes = family.map(p => {
-    return {
-      HTMLclass: "person-node",
-      text: { name: p.name },
-      image: p.img || undefined,
-      stackChildren: true,
-      id: p.id,
-      connectors: { type: 'step' },
-      innerHTML: `<div onclick="selectPerson(${p.id})" style="background-color: ${p.bgColor}; padding: 10px; border: 2px solid black">${p.name}</div>`
-    };
-  });
-
-  const chartStructure = {
+  const config = {
     chart: {
       container: "#tree",
-      node: { collapsable: true },
-      connectors: { type: "step" },
-      animateOnInit: true
+      connectors: {
+        type: 'step',
+        style: { stroke: '#000000' }
+      },
+      node: {
+        HTMLclass: 'nodeExample1'
+      }
     },
-    nodeStructure: buildTreeStructure()
+    nodeStructure: buildHierarchy()
   };
 
-  new Treant(chartStructure);
+  document.getElementById("tree").innerHTML = "";
+  new Treant(config);
 }
 
-function buildTreeStructure() {
-  const roots = family.filter(p => p.parentA === null && p.parentB === null);
-  if (roots.length === 0) return {};
-  return buildNodeRecursive(roots[0]);
-}
+function buildHierarchy() {
+  if (familyData.length === 0) return {};
 
-function buildNodeRecursive(person) {
-  const children = family.filter(p => p.parentA === person.id || p.parentB === person.id);
-  return {
-    text: { name: person.name },
-    image: person.img || undefined,
-    HTMLclass: "person-node",
-    innerHTML: `<div onclick="selectPerson(${person.id})" style="background-color: ${person.bgColor}; padding: 10px; border: 2px solid black">${person.name}</div>`,
-    children: children.map(child => buildNodeRecursive(child))
-  };
+  const root = familyData[0];
+
+  function buildNode(person) {
+    const node = {
+      text: person.text,
+      image: person.image,
+      HTMLid: person.id,
+      children: []
+    };
+    if (person.children) {
+      node.children = person.children.map(buildNode);
+    }
+    return node;
+  }
+
+  return buildNode(root);
 }
