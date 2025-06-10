@@ -2,142 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create a Fanon Family Tree</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/Treant.css" />
-  <link rel="stylesheet" href="css/custom.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create a Family Tree</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
     }
 
     header {
-      background-color: #6fa43c;
+      background-color: #5a9733;
       color: white;
-      padding: 20px;
-      font-size: 2em;
+      padding: 1em;
       text-align: center;
+      font-size: 2em;
+      font-weight: bold;
     }
 
-    .container {
+    main {
       display: flex;
-      height: 100vh;
+      height: calc(100vh - 80px);
     }
 
-    .form-panel {
+    .form-container {
       width: 30%;
-      background-color: #d1d1d1;
+      background: #ccc;
       padding: 20px;
-      overflow-y: auto;
+      box-sizing: border-box;
     }
 
-    .form-panel label {
-      font-weight: bold;
+    .form-container label {
       display: block;
-      margin-top: 10px;
-    }
-
-    .form-panel input, .form-panel select {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-    }
-
-    .form-panel button {
-      width: 100%;
-      padding: 10px;
-      background: #6fa43c;
-      border: none;
-      color: white;
       font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
+      margin-top: 1em;
     }
 
-    .form-panel .relationship-label {
-      margin-top: 20px;
+    .form-container input,
+    .form-container select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+
+    .form-container .relationship-section {
+      margin-top: 2em;
+      font-weight: bold;
       color: red;
     }
 
-    #tree-container {
+    .tree-container {
       width: 70%;
-      background-color: white;
       overflow: auto;
-      position: relative;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
     #tree {
-      width: 100%;
-      height: 100%;
+      min-width: 600px;
+      min-height: 400px;
     }
-
   </style>
-  
 </head>
 <body>
+  <header>
+    CREATE A FAMILY TREE
+  </header>
 
-  <header>CREATE A FAMILY TREE</header>
+  <main>
+    <div class="form-container">
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" />
 
-  <div class="container">
-    <div class="form-panel">
-      <label for="firstName">FIRST NAME</label>
-      <input type="text" id="firstName" placeholder="e.g. Loki" />
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" />
 
-      <label for="lastName">LAST NAME</label>
-      <input type="text" id="lastName" placeholder="e.g. Beaker" />
+      <label for="birthName">Birth Name</label>
+      <input type="text" id="birthName" />
 
-      <label for="birthName">BIRTH NAME</label>
-      <input type="text" id="birthName" placeholder="e.g. Smith" />
+      <label for="portrait">Portrait Upload</label>
+      <input type="file" id="portrait" accept="image/*" />
 
-      <label for="portrait">PORTRAIT (URL)</label>
-      <input type="text" id="portrait" placeholder="Image URL" />
+      <label for="gender">Gender</label>
+      <input type="text" id="gender" />
 
-      <label for="gender">GENDER</label>
-      <select id="gender">
-        <option value="man">Man</option>
-        <option value="woman">Woman</option>
-        <option value="non-binary">Non-binary</option>
-        <option value="transman">Trans Man</option>
-        <option value="transwoman">Trans Woman</option>
-        <option value="other">Other</option>
-      </select>
+      <label for="bgColor">Background Color</label>
+      <input type="color" id="bgColor" />
 
-      <label for="bgColor">BACKGROUND COLOR</label>
-      <input type="color" id="bgColor" value="#f5f5f5" />
+      <div class="relationship-section">
+        <label for="personA">Person A</label>
+        <select id="personA"></select>
+
+        <label for="relationType">Relationship Type</label>
+        <select id="relationType">
+          <option value="parent">Parent</option>
+          <option value="child">Child</option>
+          <option value="partner">Partner</option>
+        </select>
+
+        <label for="personB">Person B</label>
+        <select id="personB"></select>
+      </div>
 
       <button onclick="addPerson()">Add Person</button>
-
-      <div class="relationship-label" id="selectedPersonLabel">No person selected</div>
-
-      <label for="relationTarget">RELATIONSHIP TO</label>
-      <select id="relationTarget">
-        <option value="">Select another person</option>
-      </select>
-
-      <label for="relationType">IS</label>
-      <select id="relationType">
-        <option value="partner">Partner</option>
-        <option value="parentA">Parent A</option>
-        <option value="parentB">Parent B</option>
-        <option value="child">Child</option>
-        <option value="sibling">Sibling</option>
-      </select>
-
-      <button onclick="setRelationship()">Set Relationship</button>
     </div>
 
-    <div id="tree-container">
-      <div id="tree"></div>
+    <div class="tree-container">
+      <div id="tree">
+        <!-- Tree will render here -->
+      </div>
     </div>
-  </div>
+  </main>
 
- <!-- JS -->
-  <script src="js/raphael.min.js"></script>
-  <script src="js/treant.js"></script>
-  <script defer src="js/setup.js"></script>
+  <script>
+    const people = [];
+
+    function addPerson() {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const birthName = document.getElementById('birthName').value;
+      const portraitInput = document.getElementById('portrait');
+      const gender = document.getElementById('gender').value;
+      const bgColor = document.getElementById('bgColor').value;
+
+      const file = portraitInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const portrait = e.target.result;
+
+        const newPerson = {
+          id: people.length + 1,
+          name: `${firstName} ${lastName}`,
+          birthName,
+          portrait,
+          gender,
+          bgColor
+        };
+
+        people.push(newPerson);
+        updatePersonDropdowns();
+        renderTree();
+      };
+
+      if (file) reader.readAsDataURL(file);
+    }
+
+    function updatePersonDropdowns() {
+      const personA = document.getElementById('personA');
+      const personB = document.getElementById('personB');
+
+      personA.innerHTML = '';
+      personB.innerHTML = '';
+
+      people.forEach((p, i) => {
+        const optionA = new Option(p.name, i);
+        const optionB = new Option(p.name, i);
+        personA.add(optionA);
+        personB.add(optionB);
+      });
+    }
+
+    function renderTree() {
+      const tree = document.getElementById('tree');
+      tree.innerHTML = '';
+
+      people.forEach(p => {
+        const div = document.createElement('div');
+        div.style.border = '2px solid black';
+        div.style.background = p.bgColor;
+        div.style.padding = '10px';
+        div.style.margin = '10px';
+        div.style.textAlign = 'center';
+        div.innerHTML = `<img src="${p.portrait}" width="100" /><br>${p.name}`;
+        tree.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
