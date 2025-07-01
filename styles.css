@@ -1,0 +1,33 @@
+body {
+  font-family: sans-serif;
+  background: #f9f9f9;
+  padding: 20px;
+}
+
+#tree-container {
+  border: 1px solid #ccc;
+  background: white;
+  padding: 10px;
+  overflow: auto;
+  max-width: 100%;
+}
+
+.node rect {
+  fill: #b5d6f6;
+  stroke: #333;
+  rx: 10;
+  ry: 10;
+}
+
+.node text {
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.edge path {
+  fill: none;
+  stroke: #666;
+  stroke-width: 2px;
+  marker-end: url(#arrow);
+}
+
