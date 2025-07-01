@@ -1,45 +1,85 @@
 const svg = document.getElementById("tree");
 const elk = new ELK();
 
+let sims = []; // store all sims in memory
+
 fetch("sims.json")
   .then(res => res.json())
   .then(data => {
-    const nodes = data.sims.map(sim => ({
-      id: sim.id,
-      width: 100,
-      height: 50,
-      label: sim.name
-    }));
-
-    const edges = buildEdges(data.sims).map(edge => ({
-      id: `${edge.source}->${edge.target}`,
-      sources: [edge.source],
-      targets: [edge.target]
-    }));
-
-    const graph = {
-      id: "root",
-      layoutOptions: {
-        "elk.algorithm": "layered"
-      },
-      children: nodes,
-      edges: edges
-    };
-
-    elk.layout(graph).then(layout => {
-      drawGraph(layout);
-    });
+    sims = data.sims;
+    renderTree();
   });
+
+// ------------------------
+// ADD SIM FORM LOGIC
+// ------------------------
+
+document.getElementById("sim-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("sim-name").value.trim();
+  const gender = document.getElementById("sim-gender").value;
+  const id = document.getElementById("sim-id").value.trim();
+
+  // Basic ID validation
+  if (sims.some(sim => sim.id === id)) {
+    alert("A Sim with this ID already exists!");
+    return;
+  }
+
+  const newSim = {
+    id,
+    name,
+    gender,
+    children: [],
+    spouses: []
+  };
+
+  sims.push(newSim);
+  renderTree();
+
+  // Reset form
+  e.target.reset();
+});
+
+// ------------------------
+// RENDER LOGIC
+// ------------------------
+
+function renderTree() {
+  const nodes = sims.map(sim => ({
+    id: sim.id,
+    width: 100,
+    height: 50,
+    label: sim.name
+  }));
+
+  const edges = buildEdges(sims).map(edge => ({
+    id: `${edge.source}->${edge.target}`,
+    sources: [edge.source],
+    targets: [edge.target]
+  }));
+
+  const graph = {
+    id: "root",
+    layoutOptions: {
+      "elk.algorithm": "layered"
+    },
+    children: nodes,
+    edges: edges
+  };
+
+  elk.layout(graph).then(drawGraph);
+}
 
 function buildEdges(sims) {
   const edges = [];
   sims.forEach(sim => {
     (sim.children || []).forEach(childId => {
-      edges.push({ source: sim.id, target: childId, type: "parent" });
+      edges.push({ source: sim.id, target: childId });
     });
-
     (sim.spouses || []).forEach(spouseId => {
-      edges.push({ source: sim.id, target: spouseId, type: "spouse" });
+      edges.push({ source: sim.id, target: spouseId });
     });
   });
   return edges;
@@ -55,7 +95,6 @@ function drawGraph(graph) {
     </defs>
   `;
 
-  // Draw edges
   graph.edges.forEach(edge => {
     const src = graph.children.find(n => n.id === edge.sources[0]);
     const tgt = graph.children.find(n => n.id === edge.targets[0]);
@@ -72,7 +111,6 @@ function drawGraph(graph) {
     svg.appendChild(pathEl);
   });
 
-  // Draw nodes
   graph.children.forEach(node => {
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
     group.setAttribute("class", "node");
@@ -92,4 +130,3 @@ function drawGraph(graph) {
     svg.appendChild(group);
   });
 }
-
