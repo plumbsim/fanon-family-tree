@@ -27,6 +27,30 @@ body {
 .edge path {
   fill: none;
   stroke: #666;
+  #editor {
+  margin-bottom: 20px;
+  background: #eef;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+#editor input, #editor select {
+  padding: 6px;
+  margin: 5px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#editor button {
+  background: #467fcf;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
   stroke-width: 2px;
   marker-end: url(#arrow);
 }
