@@ -1,0 +1,22 @@
+{
+  "sims": [
+    {
+      "id": "s1",
+      "name": "Jane Doe",
+      "gender": "female",
+      "spouses": ["s2"],
+      "children": ["s3"]
+    },
+    {
+      "id": "s2",
+      "name": "John Doe",
+      "gender": "male",
+      "children": ["s3"]
+    },
+    {
+      "id": "s3",
+      "name": "Baby Doe",
+      "gender": "female"
+    }
+  ]
+}
