@@ -9,6 +9,19 @@
 <body>
   <h1>Sims Family Tree</h1>
   <div id="tree-container">
+<div id="editor">
+  <h2>Add Sim</h2>
+  <form id="sim-form">
+    <input type="text" id="sim-name" placeholder="Name" required />
+    <select id="sim-gender">
+      <option value="female">Female</option>
+      <option value="male">Male</option>
+      <option value="other">Other</option>
+    </select>
+    <input type="text" id="sim-id" placeholder="ID (e.g., s4)" required />
+    <button type="submit">Add Sim</button>
+  </form>
+</div>
     <svg id="tree" width="1200" height="800"></svg>
   </div>
 
